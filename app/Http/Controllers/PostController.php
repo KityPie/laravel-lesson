@@ -78,4 +78,22 @@ class PostController extends Controller
         $post->delete();
         return redirect()->route('post.index')->with('message', 'Post Successfully Deleted!');
     }
+
+    /**
+     * Display the dashboard with post counts.
+     */
+    public function dashboard()
+    {
+        $userId = Auth::user()->id;
+
+        $totalPosts = Post::where('user_id', $userId)->count();
+        $publishedPosts = Post::where('user_id', $userId)->where('status', 1)->count();
+        $unpublishedPosts = Post::where('user_id', $userId)->where('status', 0)->count();
+
+        return view('dashboard', [
+            'totalPosts' => $totalPosts,
+            'publishedPosts' => $publishedPosts,
+            'unpublishedPosts' => $unpublishedPosts
+        ]);
+    }
 }
