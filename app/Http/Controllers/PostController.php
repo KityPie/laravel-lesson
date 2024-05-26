@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -13,7 +14,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::where('user_id', Auth::user()->id)->get();
         return view('resources.post.index', ['posts' => $posts]);
     }
 
@@ -30,11 +31,11 @@ class PostController extends Controller
      */
     public function store(StorePostRequest $request)
     {
-        
         Post::create([
+            'user_id' => Auth::user()->id,
             'subject' => $request->subject,
             'post' => $request->post,
-            'status' => (is_null($request->status) ? 0 : 1)
+            'status' => ($request->status == "on" ? 1 : 0)
         ]);
         return redirect()->route('post.index')->with('message', 'Post Successfully Saved!');
     }
@@ -61,12 +62,12 @@ class PostController extends Controller
     public function update(UpdatePostRequest $request, Post $post)
     {
         $post->update([
+            'user_id' => Auth::user()->id,
             'subject' => $request->subject,
             'post' => $request->post,
-            'status' => (is_null($request->status) ? 0 : 1)
+            'status' => ($request->status == "on" ? 1 : 0)
         ]);
-        return redirect()->route('post.index')->with('message', 'Post Successfully Saved!');
-
+        return redirect()->route('post.index')->with('message', 'Post Successfully Updated!');
     }
 
     /**
